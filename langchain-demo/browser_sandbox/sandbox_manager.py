@@ -54,9 +54,9 @@ class SandboxManager:
             print(e)
             raise RuntimeError(
                 "agentrun-sdk does not install, pls run: pip install agentrun-sdk[playwright,server]"
-            )
+            ) from e
         except Exception as e:
-            raise RuntimeError(f"create Sandbox failed: {str(e)}")
+            raise RuntimeError(f"create Sandbox failed: {str(e)}") from e
 
     def get_info(self) -> Dict[str, Any]:
         if self._sandbox is None:

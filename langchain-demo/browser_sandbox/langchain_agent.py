@@ -95,7 +95,7 @@ def navigate_to_url(
                 title = page.title()
                 return f"successful navigate to: {url}\n📄 page title: {title}\n"
         except ImportError:
-            return f"pls install playwright (pip install playwright)"
+            return "pls install playwright (pip install playwright)"
         except Exception as e:
             return f"navigate to url failed: {str(e)}"
     except Exception as e:
@@ -122,7 +122,7 @@ def take_screenshot(filename: str = "screenshot.png") -> str:
                 page.screenshot(path=filename)
                 return f"screenshot save successful: {filename}"
         except ImportError:
-            return f"pls install playwright (pip install playwright)"
+            return "pls install playwright (pip install playwright)"
         except Exception as e:
             return f"take screenshot failed: {str(e)}"
     except Exception as e:

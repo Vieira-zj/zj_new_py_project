@@ -18,7 +18,6 @@ load_dotenv()
 
 _http_server: Optional[socketserver.TCPServer] = None
 _http_port: int = 8080
-_cleanup_done: bool = False
 
 
 def start_http_server() -> Optional[int]:
@@ -78,13 +77,13 @@ def open_vnc_viewer(vnc_url: str):
             print(f"VNC URL: {vnc_url[:80]}...")
             print(f"full URL: {http_url[:100]}...")
             webbrowser.open(http_url)
-            print(f"VNC is opened")
+            print("VNC is opened")
             return
 
-        print(f"HTTP server started failed, try to use file protocal...")
+        print("HTTP server started failed, try to use file protocal...")
         file_url = f"file://{vnc_html_path}?url={encoded_url}"
         webbrowser.open(file_url)
-        print(f"VNC is opened (file protocal)")
+        print("VNC is opened (file protocal)")
     except Exception as e:
         print(f"open VNC failed: {str(e)}")
 
@@ -105,6 +104,7 @@ def cleanup_sandbox():
 
 
 def signal_handler(signum, frame):
+    _, _ = signum, frame
     print("get interrupt system signal")
     cleanup_sandbox()
     print("clearup finished")

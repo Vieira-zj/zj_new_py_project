@@ -7,6 +7,6 @@ from browser_sandbox.hello_world import hello_world_help
 load_dotenv()
 
 
-def help():
+def pkg_help():
     print("PYTHONPATH:", os.getenv("PYTHONPATH"))
     print("This is a langchain browser sandbox package.")

@@ -1,12 +1,12 @@
 import sys
 
-from browser_sandbox import hello_world_help, help
+from browser_sandbox import hello_world_help, pkg_help
 
 
 def main():
     print("python version:", sys.version)
 
-    help()
+    pkg_help()
     hello_world_help()
 
 
