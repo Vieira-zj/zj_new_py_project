@@ -4,9 +4,10 @@ from browser_sandbox import hello_world_help, help
 
 
 def main():
+    print("python version:", sys.version)
+
     help()
     hello_world_help()
-    print("python version:", sys.version)
 
 
 if __name__ == "__main__":

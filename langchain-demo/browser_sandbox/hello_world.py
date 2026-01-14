@@ -8,7 +8,7 @@ def hello_world_help():
 
 def hello_world():
     sandbox = Sandbox.create(
-        template_type=TemplateType,
+        template_type=TemplateType.BROWSER,
         template_name="my-template",
         sandbox_idle_timeout_seconds=300,
     )
