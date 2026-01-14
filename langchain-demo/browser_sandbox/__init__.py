@@ -9,4 +9,4 @@ load_dotenv()
 
 def help():
     print("PYTHONPATH:", os.getenv("PYTHONPATH"))
-    print("This is the langchain browser sandbox package.")
+    print("This is a langchain browser sandbox package.")
