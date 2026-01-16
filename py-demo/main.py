@@ -1,5 +1,7 @@
 import argparse
 import os
+import signal
+import sys
 
 from dotenv import load_dotenv
 
@@ -16,22 +18,30 @@ def init_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def signal_handler(signum, frame):
+    _ = frame
+    print(f"\n\nget interrupt system signal: sign_num={signum}")
+    sys.exit(0)
+
+
 def chat():
+    # if set, process by signal_handler instead of interrupt exception
+    signal.signal(signal.SIGINT, signal_handler)
+
     user_input: str = ""
     try:
         while 1:
             user_input = input("pls input:").strip()
             print("your input:", user_input)
             if user_input.lower() in ("exit", "quit"):
+                print("bye")
                 return
     except KeyboardInterrupt:
         print("\n\nget system signal ctrl+c")
-        return
     except EOFError:
         print("\n\nget system signal ctrl+d")
-        return
     finally:
-        print("bye")
+        print("clearup")
 
 
 def main():
