@@ -1,5 +1,9 @@
-from fastapi import APIRouter, FastAPI, HTTPException, Request
+import time
+from typing import Awaitable, Callable
+
+from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
+from router import test_router
 from starlette.status import HTTP_404_NOT_FOUND
 
 router = APIRouter(tags=["fast api demo"])
@@ -13,6 +17,20 @@ async def healthz_handler():
 
 app = FastAPI(title="users managerment demo")
 app.include_router(router)
+app.include_router(test_router)
+
+
+@app.middleware("http")
+async def add_process_time_header(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+):
+    start = time.perf_counter()
+    response = await call_next(request)
+
+    process_time = f"{(time.perf_counter() - start):.4f}"
+    response.headers["X-Process-Time"] = process_time
+    print(f"request to {request.url.path} processed in {process_time} seconds")
+    return response
 
 
 # curl "http://localhost:8081/"
