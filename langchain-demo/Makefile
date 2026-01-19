@@ -1,10 +1,16 @@
-default: main
+default: help
 
-main:
-	uv run main.py
+help:
+	@uv -h
 
-dep_tree:
+run-main:
+	@uv run main.py
+
+run-eg:
+	@uv run examples/py_base.py
+
+dep-tree:
 	uv tree
 
-export_requirement:
+dump-requirements:
 	uv export --format requirements.txt > requirements.txt

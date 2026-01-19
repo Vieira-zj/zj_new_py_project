@@ -1,17 +1,26 @@
 import dataclasses
-from typing import List, Optional
+from typing import Final, List, Optional
+
+# demo: var type
+
+
+def test_const_var():
+    main_mode: Final[str] = "main"
+    print("mode:", main_mode)
+
 
 # demo: dataclass
+# parameters: slots=True, frozen=True, kw_only=True, order=True
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(slots=True, frozen=True, kw_only=True)
 class Address:
     street: str
     city: str
     zip_code: str
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(slots=True, frozen=True, kw_only=True)
 class Person:
     name: str
     age: int
@@ -51,4 +60,5 @@ def test_datacls_and_dict():
 
 
 if __name__ == "__main__":
+    # test_const_var()
     test_datacls_and_dict()
