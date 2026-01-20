@@ -2,11 +2,11 @@ from agentrun.sandbox import Sandbox, TemplateType
 from playwright.sync_api import sync_playwright
 
 
-def hello_world_help():
-    print("it's a hello world demo for sandbox+playwright.")
+def playwright_sandbox_help():
+    print("it's a hello world demo for playwright+sandbox.")
 
 
-def hello_world():
+def hello_world_main():
     sandbox = Sandbox.create(
         template_type=TemplateType.BROWSER,
         template_name="my-template",
@@ -25,4 +25,4 @@ def hello_world():
 
 
 if __name__ == "__main__":
-    hello_world()
+    hello_world_main()

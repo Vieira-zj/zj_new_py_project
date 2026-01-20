@@ -1,2 +1,2 @@
 def pkg_help():
-    print("This is a python examples package.")
+    print("this is a python examples package.")

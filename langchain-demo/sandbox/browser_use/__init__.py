@@ -2,4 +2,4 @@
 
 
 def pkg_help():
-    print("This is a langchain browser-use sandbox package.")
+    print("this is a langchain browser-use sandbox package.")

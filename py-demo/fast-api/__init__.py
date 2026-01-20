@@ -1,2 +1,2 @@
 def pkg_help():
-    print("fast api server demo")
+    print("fast api server demo.")
