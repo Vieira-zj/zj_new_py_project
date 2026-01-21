@@ -3,7 +3,7 @@ from playwright.sync_api import sync_playwright
 
 
 def playwright_sandbox_help():
-    print("it's a hello world demo for playwright+sandbox.")
+    print("it's a [playwright+sandbox] hello world demo.")
 
 
 def hello_world_main():

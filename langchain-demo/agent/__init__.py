@@ -1,2 +1,2 @@
 def pkg_help():
-    print("this is a langchain / langgraph agent examples.")
+    print("the langchain / langgraph agent examples.")

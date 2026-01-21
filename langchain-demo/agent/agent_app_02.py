@@ -9,13 +9,14 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 from langgraph.graph.message import AnyMessage, add_messages
 from langgraph.prebuilt import ToolNode
-from pydantic import SecretStr
 from rich.console import Console
 from rich.markdown import Markdown
 
+# env
+
 load_dotenv()
 
-# env
+console = Console()
 
 
 def setup_env():
@@ -30,12 +31,6 @@ def setup_env():
 
 # llm and tools
 
-console = Console()
-
-
-class AgentState(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
-
 
 @tool
 def web_search(query: str) -> str:
@@ -44,16 +39,24 @@ def web_search(query: str) -> str:
     return "sunny"
 
 
-api_key = os.getenv("OPENAI_API_KEY", "")
+def get_api_key() -> str:
+    return os.getenv("OPENAI_API_KEY", "")
+
+
 llm = ChatOpenAI(
     model="gpt-5-mini",
     temperature=0.2,
-    api_key=SecretStr(api_key),
+    api_key=get_api_key,
     base_url="https://api.openai.com/v1",
 )
+
 llm_with_tools = llm.bind_tools([web_search])
 
 # single agent
+
+
+class AgentState(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
 
 
 def monolithic_agent_node(state: AgentState):
@@ -63,8 +66,7 @@ def monolithic_agent_node(state: AgentState):
 
 
 def should_continue(state: AgentState):
-    messages = state["messages"]
-    last_message = messages[-1]
+    last_message = state["messages"][-1]
     if hasattr(last_message, "tool_calls") and last_message.tool_calls:  # type: ignore
         return "tools"
     return END
@@ -120,21 +122,21 @@ class MultiAgentState(TypedDict):
     final_report: Optional[str]
 
 
-def create_specialist_node(persona: str, output_key: str) -> Callable:
+def create_specialist_node(persona: str, node_key: str) -> Callable:
     """Factory function to create a specialist agent node."""
     system_prompt = (
         persona
         + "\n\nYou have access to a web search tool. Your output MUST be a concise report section in Chinese, formatted in markdown, focusing only on your area of expertise."
     )
-
     prompt_template = ChatPromptTemplate.from_messages(
         [("system", system_prompt), ("human", "{user_request}")]
     )
+
     agent = prompt_template | llm_with_tools
 
     def specialist_node(state: MultiAgentState):
         console.print(
-            f"--- CALLING {output_key.replace('_report','').upper()} ANALYST ---"
+            f"--- CALLING {node_key.replace('_report','').upper()} ANALYST ---"
         )
         result = agent.invoke({"user_request": state["user_request"]})
         content = (
@@ -142,7 +144,7 @@ def create_specialist_node(persona: str, output_key: str) -> Callable:
             if result.content
             else f"No direct content, tool calls: {result.tool_calls}"
         )
-        return {output_key: content}
+        return {node_key: content}
 
     return specialist_node
 
@@ -152,13 +154,13 @@ def report_writer_node(state: MultiAgentState):
     console.print("--- CALLING REPORT WRITER ---")
     prompt = f"""You are an expert financial editor. Your task is to combine the following specialist reports into a single, professional, and cohesive market analysis report in Chinese. Add a brief introductory and concluding paragraph.
 
-    News & Sentiment Report:
+News & Sentiment Report:
 {state['news_report']}
 
-    Technical Analysis Report:
+Technical Analysis Report:
 {state['technical_report']}
 
-    Financial Performance Report:
+Financial Performance Report:
 {state['financial_report']}
 """
     final_report = llm.invoke(prompt).content
@@ -211,5 +213,5 @@ def multiple_agents_main():
 
 if __name__ == "__main__":
     setup_env()
-    single_agent_main()
+    # single_agent_main()
     multiple_agents_main()

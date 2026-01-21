@@ -1,5 +1,6 @@
 import os
 import traceback
+from typing import Any, Dict
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -10,7 +11,7 @@ from pydantic import SecretStr
 load_dotenv()
 
 
-def image_view_by_llm(image_url, prompt) -> str:
+def image_view_by_llm(image_url, prompt) -> Dict[str, Any]:
     api_key = os.getenv("OPENAI_API_KEY", "")
     llm = ChatOpenAI(
         model="gpt-4o-mini",
@@ -24,12 +25,12 @@ def image_view_by_llm(image_url, prompt) -> str:
             HumanMessage(content=f"prompt: {prompt}, image_url={image_url}"),
         ],
     )
-    return completion.model_dump()["code"]
+    return completion.model_dump()
 
 
 def auto_main(pw: Playwright):
     code_image_id = "#demoCaptcha_CaptchaImage"
-    security_code_input_id = "#captchaCode"
+    secret_code_input_id = "#captchaCode"
     validate_button_id = "#validateCaptchaButton"
     validation_result_text_id = "#validationResult"
 
@@ -42,10 +43,10 @@ def auto_main(pw: Playwright):
         img_src = page.locator(code_image_id).get_attribute("src")
 
         prompt = "请识别图像中的验证码并仅返回结果字符, 里面的内容只会由数字和字母组成, 千万不要输出任何标点符号内容. 并且可能会有一些干扰线, 请仔细甄别后给出结果."
-        security_code = image_view_by_llm(img_src, prompt)
-        print("security code in image:", security_code)
+        secret_code = image_view_by_llm(img_src, prompt)["code"]
+        print("secret code in image:", secret_code)
 
-        page.type(security_code_input_id, security_code, delay=100)
+        page.type(secret_code_input_id, secret_code, delay=100)
         page.click(validate_button_id)
         page.wait_for_selector(validation_result_text_id)
         result = page.inner_text(validation_result_text_id)

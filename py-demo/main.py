@@ -45,8 +45,9 @@ def chat():
 
 
 def main():
-    env = os.getenv("ENV", "unknown")
-    print(f"run env: {env}")
+    print("python root:", os.getenv("PYROOT", "unknown"))
+    print("python project home:", os.getenv("PYHOME", "unknown"))
+    print(f"run env: {os.getenv("ENV", "unknown")}")
 
 
 # run cli:
@@ -57,7 +58,8 @@ if __name__ == "__main__":
     args = init_args()
     if args.verbose:
         print("verbose mode enabled")
-        print(f"run type: {args.mode}")
+        print(f"run mode: {args.mode}")
+        print()
 
     match args.mode:
         case "main":

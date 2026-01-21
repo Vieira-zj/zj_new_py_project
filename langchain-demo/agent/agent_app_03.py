@@ -81,17 +81,6 @@ SENSITIVE_TOOLS = [cancel_hotel, update_ticket]
 # ----------------------------
 
 
-def route_from_main(state: TravelState) -> str:
-    last = state["messages"][-1]
-    if hasattr(last, "tool_calls") and last.tool_calls:
-        tool_name = last.tool_calls[0]["name"]
-        if tool_name == "ToFlightAssistant":
-            return "to_flights"
-        if tool_name == "ToHotelAssistant":
-            return "to_hotels"
-    return "end_or_wait"
-
-
 @tool
 def ToFlightAssistant() -> str:
     return "route:flights"
@@ -103,6 +92,18 @@ def ToHotelAssistant() -> str:
 
 
 ROUTING_TOOLS = [ToFlightAssistant, ToHotelAssistant]
+
+
+def route_from_main(state: TravelState) -> str:
+    last = state["messages"][-1]
+    if hasattr(last, "tool_calls") and last.tool_calls:
+        tool_name = last.tool_calls[0]["name"]
+        if tool_name == "ToFlightAssistant":
+            return "to_flights"
+        if tool_name == "ToHotelAssistant":
+            return "to_hotels"
+    return "end_or_wait"
+
 
 # ----------------------------
 # 4. LLM
@@ -134,7 +135,7 @@ def create_entry_node(target: Literal["flights", "hotels"]) -> Any:
         )
         return {
             **state,
-            "messages": state["messages"] + [SystemMessage(content=background)],
+            "messages": [SystemMessage(content=background)] + state["messages"],
             "agent_stack": stack,
         }
 
@@ -143,11 +144,11 @@ def create_entry_node(target: Literal["flights", "hotels"]) -> Any:
 
 @tool
 def CompleteOrEscalate(reason: str) -> str:
-    return f"complete:{reason}"
+    return f"complete: {reason}"
 
 
 # ----------------------------
-# 6. Interrupt
+# 6. Interrupt Router
 # ----------------------------
 
 
@@ -240,7 +241,6 @@ def main_assistant(state: TravelState) -> TravelState:
 
 
 def flight_assistant(state: TravelState) -> TravelState:
-    llm = create_llm().bind_tools([*SAFE_TOOLS, *SENSITIVE_TOOLS, CompleteOrEscalate])
     sys = SystemMessage(
         content=(
             "你是航班助手.\n"
@@ -248,7 +248,9 @@ def flight_assistant(state: TravelState) -> TravelState:
             "当你准备执行敏感工具时, 不要直接调用工具; 请在 state.pending_action 写入待执行信息, 并让系统走授权网关.\n"
         )
     )
+    llm = create_llm().bind_tools([*SAFE_TOOLS, *SENSITIVE_TOOLS, CompleteOrEscalate])
     out = llm.invoke([sys] + state["messages"])
+
     if hasattr(out, "tool_calls") and out.tool_calls:
         for tc in out.tool_calls:
             name = tc["name"]
@@ -266,7 +268,6 @@ def flight_assistant(state: TravelState) -> TravelState:
 
 
 def hotel_assistant(state: TravelState) -> TravelState:
-    llm = create_llm().bind_tools([*SAFE_TOOLS, *SENSITIVE_TOOLS, CompleteOrEscalate])
     sys = SystemMessage(
         content=(
             "你是酒店助手.\n"
@@ -274,7 +275,9 @@ def hotel_assistant(state: TravelState) -> TravelState:
             "当你准备执行敏感工具时, 不要直接调用工具; 请在 state.pending_action 写入待执行信息, 并让系统走授权网关.\n"
         )
     )
+    llm = create_llm().bind_tools([*SAFE_TOOLS, *SENSITIVE_TOOLS, CompleteOrEscalate])
     out = llm.invoke([sys] + state["messages"])
+
     if hasattr(out, "tool_calls") and out.tool_calls:
         for tc in out.tool_calls:
             name = tc["name"]
@@ -348,7 +351,7 @@ def build_graph() -> Any:
 # ----------------------------
 
 
-def agent_main():
+def main():
     graph = build_graph()
     state: TravelState = {
         "messages": [],
@@ -388,4 +391,4 @@ if __name__ == "__main__":
     if not os.getenv("OPENAI_API_KEY"):
         raise RuntimeError("请先设置环境变量 OPENAI_API_KEY")
 
-    agent_main()
+    main()

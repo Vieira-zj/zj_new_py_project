@@ -9,17 +9,17 @@ class AgentState(TypedDict):
     next_step: Optional[str]
 
 
-def intent_analysis_agent(state):
+def intent_analysis_node(state):
     print(f"analysis user intent {state}...")
     return {"user_intent": "repair", "next_step": "dispatch"}
 
 
-def assistant_reply_agent(state):
+def assistant_reply_node(state):
     print("💬 generate reply...")
     return {"messages": state["messages"] + ["query results"]}
 
 
-def dispatch_ticket_agent(state):
+def dispatch_ticket_node(state):
     print("dispatch ticket ...")
     # mock api call
     return {"messages": state["messages"] + ["ticket created"]}
@@ -33,9 +33,9 @@ def router(state):
 
 def agent_main():
     workflow = StateGraph(AgentState)
-    workflow.add_node("intent_analysis", intent_analysis_agent)
-    workflow.add_node("assistant_reply", assistant_reply_agent)
-    workflow.add_node("dispatch_ticket", dispatch_ticket_agent)
+    workflow.add_node("intent_analysis", intent_analysis_node)
+    workflow.add_node("assistant_reply", assistant_reply_node)
+    workflow.add_node("dispatch_ticket", dispatch_ticket_node)
 
     workflow.set_entry_point("intent_analysis")
     workflow.add_conditional_edges(
@@ -48,10 +48,9 @@ def agent_main():
 
     app = workflow.compile()
     print("start workflow")
-    input_state = AgentState(
-        **{"messages": ["my tv is broken"], "user_intent": None, "next_step": None}
+    output = app.invoke(
+        {"messages": ["my tv is broken"], "user_intent": None, "next_step": None}
     )
-    output = app.invoke(input_state)
     print("agent output:", output["messages"])
 
 
