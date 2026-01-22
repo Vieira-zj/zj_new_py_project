@@ -17,7 +17,8 @@ def test_call_package_fn():
 def test_secret_str():
     console = Console()
     s = SecretStr("hello")
-    console.print(f"secret string: [bold red]{s.get_secret_value()}[/bold red]")
+    console.print(f"mark secret str: {s}")
+    console.print(f"raw secret str: [bold red]{s.get_secret_value()}[/bold red]")
 
 
 # demo: typing
@@ -83,9 +84,9 @@ def test_update_immutable_dataclass():
 
 if __name__ == "__main__":
     # test_call_package_fn()
-    # test_secret_str()
+    test_secret_str()
 
     # test_py_typing_list()
-    test_py_typing_iter()
+    # test_py_typing_iter()
 
     # test_update_immutable_dataclass()
