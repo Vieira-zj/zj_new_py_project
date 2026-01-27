@@ -1,7 +1,7 @@
 import dataclasses
-from typing import Final, List, Optional
+from typing import Final, List, Optional, TypedDict
 
-# demo: var type
+# example: var type
 
 
 def test_const_var():
@@ -9,7 +9,45 @@ def test_const_var():
     print("mode:", main_mode)
 
 
-# demo: dataclass
+# calculation
+
+
+def test_cal_division():
+    float_res = 10 / 3
+    print(f"result: {float_res:.2f}")
+
+    int_res = 10 // 3  # 返回整数
+    print("result:", int_res)
+
+
+# example: typed dict
+
+
+def test_class_with_typeddict():
+    class Employee(TypedDict):
+        name: str
+        id: int
+        department: str
+        is_active: bool
+
+    emp: Employee = {
+        "name": "Bar",
+        "id": 1024,
+        "department": "Engineering",
+        "is_active": True,
+    }
+
+    print(f"type: {type(emp)}")
+    print(f"is dict: {isinstance(emp, dict)}")
+    print()
+
+    print(f"name: {emp['name']}")
+    print(f"id: {emp['id']}")
+    print(f"department: {emp['department']}")
+    print(f"active: {'Yes' if emp.get('is_active') else 'No'}")
+
+
+# example: dataclass
 # parameters: slots=True, frozen=True, kw_only=True, order=True
 
 
@@ -61,4 +99,7 @@ def test_datacls_and_dict():
 
 if __name__ == "__main__":
     # test_const_var()
-    test_datacls_and_dict()
+    test_cal_division()
+
+    # test_class_with_typeddict()
+    # test_datacls_and_dict()
