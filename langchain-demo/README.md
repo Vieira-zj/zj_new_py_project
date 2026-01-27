@@ -1,2 +1,2 @@
-# Py Demo: langchain
+# LangChain/LangGraph Demo
 
