@@ -1,3 +1,5 @@
+from typing import Any
+
 import torch
 from torch import nn
 
@@ -27,7 +29,9 @@ class QdogBabyLearnConfig:
 # 3. Transformer Block
 # ==========================================
 class TransformerBlock(nn.Module):
-    pass
+    def forward(self, x: Any) -> Any:
+        # to impl
+        return x
 
 
 # ==========================================
@@ -52,6 +56,10 @@ class MultiHeadAttention(nn.Module):
 
         self.register_buffer("mask", torch.tril(torch.ones(context_size, context_size)))
 
+    def forward(self, x: Any) -> Any:
+        # to impl
+        return x
+
 
 # ==========================================
 # 5. 前馈网络 (发散思维 -> 收敛总结)
@@ -59,4 +67,6 @@ class MultiHeadAttention(nn.Module):
 
 
 class FeedForward(nn.Module):
-    pass
+    def forward(self, x: Any) -> Any:
+        # to impl
+        return x
