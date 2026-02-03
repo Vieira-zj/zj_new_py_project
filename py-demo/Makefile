@@ -4,8 +4,12 @@ default: help
 
 # cli: make help ENV=live
 help:
-	@uv -h
+	@uv --version
 	@echo "\nEnv: $(ENV)"
+
+init-env:
+	uv venv --python 3.12.1
+	uv sync
 
 run-main:
 	uv run main.py
