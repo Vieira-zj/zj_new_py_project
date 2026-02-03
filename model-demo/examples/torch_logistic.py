@@ -3,7 +3,7 @@ from typing import Any, Tuple
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
-from torch import Tensor, nn
+from torch import Tensor, nn, optim
 from torch.distributions import MultivariateNormal
 
 
@@ -24,7 +24,7 @@ def my_loss(x, y):
     return loss
 
 
-def mock_data() -> Tuple[Tensor, Tensor]:
+def mock_samples() -> Tuple[Tensor, Tensor]:
     # 设置两个高斯分布的均值向量和协方差矩阵
     mu1 = -3 * torch.ones(2)
     mu2 = 3 * torch.ones(2)
@@ -58,7 +58,7 @@ def mock_data() -> Tuple[Tensor, Tensor]:
 
 def test_logistic_process():
     # step1: 数据准备
-    x, y = mock_data()
+    x, y = mock_samples()
 
     # step2: 线性方程
     # 定义了线性模型的输入维度 D_in 和输出维度 D_out
@@ -83,6 +83,7 @@ def test_logistic_process():
 
 
 def test_logistic_model():
+    # 模型定义
     class LogisticRegression(nn.Module):
         def __init__(self, D_in: int):
             super(LogisticRegression, self).__init__()
@@ -94,11 +95,36 @@ def test_logistic_model():
             output = self.sigmoid(x)
             return output
 
-    x, y = mock_data()
+    x, y = mock_samples()
     lr_model = LogisticRegression(2)
     loss = nn.BCELoss()
+
     result = loss(lr_model(x), y)
     print("loss:", result)
+
+    # 模型训练
+    optimizer = optim.SGD(lr_model.parameters(), lr=0.03)
+
+    iters = 10
+    batch_size = 10
+    for _ in range(iters):
+        for i in range(int(len(x) / batch_size)):
+            inputs = x[i * batch_size : (i + 1) * batch_size]
+            target = y[i * batch_size : (i + 1) * batch_size]
+            # 前向传播
+            outputs = lr_model(inputs)
+            l = loss(outputs, target)
+            # 反向传播和优化
+            optimizer.zero_grad()
+            l.backward()
+            optimizer.step()
+
+    # 模型评估
+    lr_model.eval()
+    with torch.no_grad():  # 不需要计算梯度
+        predictions = lr_model(x)
+        l = loss(predictions, y)
+    print("final loss:", loss.item())
 
 
 if __name__ == "__main__":
