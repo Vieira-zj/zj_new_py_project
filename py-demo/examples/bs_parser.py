@@ -1,6 +1,6 @@
 from typing import List
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 
 def test_parse_html_01():
@@ -95,12 +95,18 @@ def test_parse_html_02():
         print("user list table is not found")
         return
 
+    print("html table:")
     print(user_list.prettify())
 
+    print("\nmarkdown table:")
+    print_html_table_as_markdown(user_list)
+
+
+def print_html_table_as_markdown(tab_element: Tag):
     # parse table headers
     headers: List[str] = []
     splits: List[str] = []
-    ths = user_list.find_all("th")
+    ths = tab_element.find_all("th")
     for th in ths:
         column = th.get_text()
         headers.append(column)
@@ -108,17 +114,67 @@ def test_parse_html_02():
 
     # parse table rows
     rows: List[List[str]] = []
-    tds = user_list.find_all("td")
+    tds = tab_element.find_all("td")
     for i in range(0, len(tds), len(ths)):
         rows.append([tds[i].get_text(), tds[i + 1].get_text()])
 
-    print("\nmarkdown table:")
     print(f"| {' | '.join(headers)} |")
     print(f"| {' | '.join(splits)} |")
     for row in rows:
         print(f"| {' | '.join(row)} |")
 
 
+def test_parse_html_03():
+    """walk through every element in the html doc tree."""
+    html_doc = """<!doctype html>
+<html>
+  <head>
+    <title>My Page</title>
+  </head>
+  <body>
+    <h1>Welcome to my website!</h1>
+    <p class="intro">This is an <span>introduction</span> paragraph.</p>
+    <div>
+      <table id="user_list">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>User Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>id1001</td>
+            <td>Foo</td>
+          </tr>
+          <tr>
+            <td>id1002</td>
+            <td>Bar</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>"""
+
+    soup = BeautifulSoup(markup=html_doc, features="html.parser")
+    for element in soup.descendants:
+        if not isinstance(element, Tag):
+            continue
+
+        match element.name:
+            case "h1":
+                print("h1 text:", element.get_text())
+            case "p":
+                print("paragraph text:", element.get_text())
+            case "table":
+                print("\nhtml table:")
+                print(element.prettify())
+                print("\nmarkdown table:")
+                print_html_table_as_markdown(element)
+
+
 if __name__ == "__main__":
     # test_parse_html_01()
-    test_parse_html_02()
+    # test_parse_html_02()
+    test_parse_html_03()
