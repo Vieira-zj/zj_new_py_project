@@ -2,6 +2,12 @@ import random
 from typing import Dict, Tuple
 
 
+def test_iter_enumerate():
+    l = ["a", "b", "c", "x"]
+    for i, _ in enumerate(l):
+        print("index:", i)
+
+
 def test_return_multi_param():
     def get_number_and_str() -> Tuple[int, str]:
         n = random.randint(1, 5)
@@ -14,4 +20,5 @@ def test_return_multi_param():
 
 
 if __name__ == "__main__":
-    test_return_multi_param()
+    test_iter_enumerate()
+    # test_return_multi_param()
