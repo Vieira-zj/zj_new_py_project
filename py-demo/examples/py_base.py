@@ -1,3 +1,4 @@
+# -- coding: utf-8 --
 import dataclasses
 from typing import Final, List, Optional, TypedDict
 

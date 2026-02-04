@@ -9,7 +9,7 @@ help:
 
 init-env:
 	uv venv --python 3.12.1
-	uv sync
+	uv sync --frozen
 
 run-main:
 	uv run main.py
