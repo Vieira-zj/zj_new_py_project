@@ -1,16 +1,18 @@
 # -- coding: utf-8 --
 import dataclasses
+import json
+import os
+import shutil
+import tempfile
+from contextlib import contextmanager
 from typing import Final, List, Optional, TypedDict
 
-# example: var type
+# example: base
 
 
 def test_const_var():
     main_mode: Final[str] = "main"
     print("mode:", main_mode)
-
-
-# calculation
 
 
 def test_cal_division():
@@ -98,9 +100,39 @@ def test_datacls_and_dict():
     print("person4:", person4.name, person4.age)
 
 
+# example: context manager
+
+
+@contextmanager
+def temporary_workspace():
+    ws_path = tempfile.mkdtemp()
+    try:
+        print(f"current workspace: {ws_path}")
+        yield ws_path  # 将控制权交给 with block
+    finally:
+        shutil.rmtree(ws_path)
+        print(f"clear workspace: {ws_path}")
+
+
+def test_context_manager():
+    with temporary_workspace() as ws:
+        src = "/tmp/test/output.json"
+        dst = os.path.join(ws, "output.bak")
+
+        print(f"copy file: from {src} to {dst}")
+        shutil.copy(src, dst)
+
+        print("load json")
+        with open(dst, mode="r", encoding="utf-8") as f:
+            obj: dict = json.load(f)
+            print(f"error code: {obj.get('error', 1)}")
+
+
 if __name__ == "__main__":
     # test_const_var()
-    test_cal_division()
+    # test_cal_division()
 
     # test_class_with_typeddict()
     # test_datacls_and_dict()
+
+    test_context_manager()
