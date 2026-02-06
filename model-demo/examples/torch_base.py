@@ -1,19 +1,70 @@
 import torch
-from torch import Tensor
+from torch import Tensor, nn
 
 # example: torch
+
+
+def test_torch_device():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(device.type)
 
 
 def test_torch_tensor():
     print(f"torch.tensor default as: {torch.tensor(1).dtype}")
 
     t1 = torch.tensor([[1, 2], [3, 4]], dtype=torch.float64)
-    print(t1)
-    t2 = torch.ones((2, 2))
-    print(t2)
+    print(f"tensor:\n{t1}")
+
+    t2 = torch.arange(5)
+    print(f"arange:\n{t2}")
+
+    t3 = torch.ones((2, 2))
+    print(f"ones:\n{t3}")
+
+    t4 = torch.rand(3, 3)
+    print(f"rand:\n{t4}")
+    t5 = torch.randn(3, 3)
+    print(f"randn:\n{t5}")
 
 
-def test_torch_calculation():
+def test_torch_builtin():
+    a = torch.tensor([-1.1, 0.5, 0.501, 0.99])
+    print(f"round:\n{torch.round(a)}")
+
+    # 增加维度
+    x = torch.randn(3, 4)
+    x_unsq = x.unsqueeze(0)
+    print(f"unsqueeze:\n{x_unsq.shape}")
+
+    # 减少维度
+    x_sq = x_unsq.squeeze(0)
+    print(f"squeeze:\n{x_sq.shape}")
+
+    # 转置
+    y = x.transpose(0, 1)
+    print(f"transpose:\n{y.shape}")
+
+
+def test_torch_view():
+    x = torch.randn(2, 3, 4)
+    print("is_contiguous:", x.is_contiguous())
+    print(x)
+
+    # 连续使用 view
+    y = x.view(6, 4)
+    print(y)
+
+    # 转置后变为非连续
+    print("\ntranspose:")
+    x_t = x.transpose(1, 2)
+    print(x_t.is_contiguous())  # false
+
+    # 非连续使用 reshape
+    y_t = x_t.reshape(6, 4)
+    print(y_t)
+
+
+def test_torch_calculate():
     # 逐元素相乘
     a = torch.tensor([[1, 2], [3, 4]])
     b = torch.tensor([[1, 2], [3, 4]])
@@ -25,18 +76,19 @@ def test_torch_calculation():
     print(c2)
 
 
-def test_torch_build_in():
-    a = torch.tensor([-1.1, 0.5, 0.501, 0.99])
-    print(f"round:\n{torch.round(a)}")
-
-    print(f"arange:\n{torch.arange(5)}")
-
-    print(f"rand:\n{torch.rand(3, 3)}")
-    print(f"randn:\n{torch.randn(3, 3)}")
+def test_torch_grad():
+    x = torch.tensor(2.0, requires_grad=True)
+    y = x**2 + 2 * x + 2
+    # 计算梯度
+    y.backward()
+    print(f"在 x=2 处的导数: {x.grad}")
 
 
-def test_torch_slice():
-    pass
+def test_torch_regexp():
+    x = torch.randn(32, 100)
+    dropout = nn.Dropout(p=0.2)  # 丢弃 20% 神经元
+    x_dropped = dropout(x)  # 训练时随机置零部分元素
+    print(f"dropout: {x_dropped}")
 
 
 # example: attention
@@ -93,8 +145,14 @@ def my_attn_scores(inputs: Tensor) -> Tensor:
 
 
 if __name__ == "__main__":
-    # test_torch_tensor()
-    # test_torch_calculation()
-    # test_torch_build_in()
+    test_torch_device()
 
-    test_token_attention()
+    # test_torch_tensor()
+    # test_torch_builtin()
+    # test_torch_view()
+    # test_torch_calculate()
+
+    # test_torch_grad()
+    # test_torch_regexp()
+
+    # test_token_attention()
