@@ -1,2 +1,2 @@
-def pk_help():
-    return "python base examples."
+def pkg_help():
+    print("python base examples.")
